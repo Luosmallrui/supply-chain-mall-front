@@ -1,19 +1,20 @@
-/*
- * @Author: {zhengzhuang}
- * @Date: 2022-05-30 11:36:48
- * @LastEditors: {zhengzhuang}
- * @LastEditTime: 2024-06-21 11:32:59
- * @Description:
- */
-import React from "react";
-import { Button, Text, View } from "@tarojs/components";
-import { useSnapshot } from "valtio";
-import { store } from '../../models/index'
+import {setTabBarIndex} from "@/store/tabbar";
+import Taro from "@tarojs/taro";
+import React, {useEffect} from "react";
+import {Button, Text, View} from "@tarojs/components";
+import {useSnapshot} from "valtio";
+import {store} from '../../models/index'
 import "./index.less";
 
 const User: React.FC = () => {
+  useEffect(() => {
+    setTabBarIndex(1)
+  }, [])
 
-  const { user } = useSnapshot(store)
+  Taro.useDidShow(() => {
+    setTabBarIndex(1)
+  })
+  const {user} = useSnapshot(store)
 
   return (
     <View className='user_box'>

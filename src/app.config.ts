@@ -1,10 +1,3 @@
-/*
- * @Author: {zhengzhuang}
- * @Date: 2022-10-31 11:26:20
- * @LastEditors: {zhengzhuang}
- * @LastEditTime: 2022-10-31 14:07:50
- * @Description:
- */
 export default defineAppConfig({
   pages: [
     'pages/index/index',
@@ -17,10 +10,10 @@ export default defineAppConfig({
     navigationBarTextStyle: 'black',
   },
   tabBar: {
-    color: '#86909C',
-    selectedColor: '#3491FA',
+    custom: true, // 启用自定义tabBar
+    color: '#999999',
+    selectedColor: '#1677FF',
     backgroundColor: '#ffffff',
-    borderStyle: 'white',
     list: [
       {
         pagePath: 'pages/index/index',
@@ -35,8 +28,7 @@ export default defineAppConfig({
   requiredPrivateInfos: ['getLocation'],
   permission: {
     'scope.userLocation': {
-      desc: '你的位置信息将用于小程序位置接口的效果展示', // 定位打卡获取当前位置信息
+      desc: '你的位置信息将用于小程序位置接口的效果展示',
     },
   },
-
 })

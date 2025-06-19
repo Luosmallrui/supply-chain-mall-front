@@ -1,3 +1,4 @@
+import {setTabBarIndex} from "@/store/tabbar";
 import {useEffect, useState} from 'react';
 import {View, Text, Image, Input, SwiperItem, Swiper} from '@tarojs/components';
 import './index.less';
@@ -11,7 +12,15 @@ const HomePage = () => {
 
   useEffect(() => {
     getLocation();
+    // 使用 setTimeout 确保 TabBar 组件已经渲染完成
+    setTabBarIndex(0)
   }, []);
+
+
+  // 页面显示时也设置一次，确保状态正确
+  Taro.useDidShow(() => {
+    setTabBarIndex(0)
+  })
 
   const getLocation = () => {
     Taro.getSetting({
