@@ -1,10 +1,80 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {View, Text, Image, Input, SwiperItem, Swiper} from '@tarojs/components';
 import './index.less';
+// eslint-disable-next-line import/first
+import Taro from "@tarojs/taro";
 
 const HomePage = () => {
   const [searchValue, setSearchValue] = useState('');
 
+  const [location, setLocation] = useState('定位中...');
+
+  useEffect(() => {
+    getLocation();
+  }, []);
+
+  const getLocation = () => {
+    Taro.getSetting({
+      success: (res) => {
+        if (res.authSetting['scope.userLocation']) {
+          getLocationInfo();
+        } else {
+          Taro.authorize({
+            scope: 'scope.userLocation',
+            success: () => {
+              getLocationInfo();
+            },
+            fail: () => {
+              setLocation('未授权定位');
+            }
+          });
+        }
+      }
+    });
+  };
+
+  const getLocationInfo = () => {
+    Taro.getLocation({
+      type: 'gcj02', // 使用国内标准坐标系
+      altitude: true, // 获取高度信息
+      isHighAccuracy: true, // 使用高精度定位
+      highAccuracyExpireTime: 4000, // 高精度定位超时时间
+      success: (res) => {
+        console.log('定位结果:', res);
+
+        // 使用有效的API密钥进行逆地理编码
+        Taro.request({
+          url: 'https://apis.map.qq.com/ws/geocoder/v1/',
+          data: {
+            location: `${res.latitude},${res.longitude}`,
+            key: '7GEBZ-DLZKN-TRUFI-S7MTP-UISI6-4XBGI', // 需要替换为有效密钥
+            get_poi: 1,
+            poi_options: 'policy=1;radius=1000'
+          },
+          success: (response) => {
+            console.log('逆地理编码结果:', response.data);
+            const data = response.data;
+            if (data && data.status === 0) {
+              const address = data.result;
+              const city = address.address_component.city || address.address_component.district;
+              setLocation(city);
+            } else {
+              console.error('逆地理编码失败:', data);
+              setLocation('定位解析失败');
+            }
+          },
+          fail: (error) => {
+            console.error('请求失败:', error);
+            setLocation('网络请求失败');
+          }
+        });
+      },
+      fail: (error) => {
+        console.error('定位失败:', error);
+        setLocation('定位失败');
+      }
+    });
+  };
   const animalCategories = [
     {
       name: '澳洲和牛',
@@ -85,9 +155,10 @@ const HomePage = () => {
       {/* 沉浸式顶部 */}
       <View className='immersive-header'>
         <View className='status-bar'>
-          <View className='location-pin'>
+          <View className='location-pin' onClick={getLocation}>
             <Text className='pin-icon'>📍</Text>
-            <Text className='city-name'>成都市</Text>
+            <Text className='city-name'>{location}</Text>
+            <Text className='location-arrow'>▼</Text>
           </View>
         </View>
 
@@ -106,18 +177,30 @@ const HomePage = () => {
       </View>
 
       {/* 轮播背景 */}
-      <View className='hero-banner'>
-        <Image
-          src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop'
-          mode='aspectFill'
-          className='hero-image'
-        />
-        <View className='hero-overlay'/>
-        <View className='banner-indicators'>
-          <View className='indicator active'/>
-          <View className='indicator'/>
-        </View>
-      </View>
+      <Swiper
+        className='hero-banner'
+        indicatorDots
+        autoplay
+        interval={3000}
+        circular
+      >
+        <SwiperItem>
+          <Image
+            src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop'
+            mode='aspectFill'
+            className='hero-image'
+          />
+          <View className='hero-overlay'/>
+        </SwiperItem>
+        <SwiperItem>
+          <Image
+            src='https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&h=600&fit=crop'
+            mode='aspectFill'
+            className='hero-image'
+          />
+          <View className='hero-overlay'/>
+        </SwiperItem>
+      </Swiper>
 
       {/* 动物分类卡片 */}
       <View className='animal-showcase'>

@@ -9,6 +9,23 @@ import {PropsWithChildren} from 'react'
 import {useLaunch} from '@tarojs/taro'
 import {appUpdate} from './utils'
 import './app.less'
+// 在app.js或app.tsx文件顶部添加这段代码
+if (typeof console.time !== 'function') {
+  const timeMap = {};
+
+  console.time = function(label) {
+    timeMap[label] = Date.now();
+  };
+
+  console.timeEnd = function(label) {
+    if (timeMap[label]) {
+      console.log(`${label}: ${Date.now() - timeMap[label]}ms`);
+      delete timeMap[label];
+    } else {
+      console.log(`Timer '${label}' does not exist`);
+    }
+  };
+}
 
 function App({children}: PropsWithChildren<any>) {
 
