@@ -58,6 +58,12 @@ export default function UserPage() {
   ];
 
   const handleItemClick = (label: string) => {
+    if (label === '全部订单') {
+      Taro.navigateTo({
+        url: '/pages/order/index'  // 确保这个路径正确
+      })
+      return
+    }
     Taro.showToast({
       title: `点击了${label}`,
       icon: 'none'
